@@ -1,0 +1,111 @@
+{
+  "name": "oh-my-starlight",
+  "description": "OmS: Starlight's learning layer on top of OmO. Routing brain + receipts + eval battery + receipt auto-capture plugin. Not a fork of OmO - a package of assets that drive it.",
+  "note": "Paths are repo-root relative. fleet/ scripts are the single source of truth; this manifest indexes the package, it does not copy it. Phase 3 (public template) sanitizes and relocates copies.",
+  "schema": "fleet/routing.schema.json",
+  "schema_note": "Schema is the SoT for models, chains, caps, and package version (read version from the schema, never duplicate it here).",
+  "files": [
+    {
+      "path": "fleet/routing.schema.json",
+      "role": "SoT: task classes, model chains, token pass keys, night cap, receipts/eval battery config"
+    },
+    {
+      "path": "fleet/route_task.py",
+      "role": "classify + route + receipt recording (fast-path classifier)"
+    },
+    {
+      "path": "fleet/route_classifier.py",
+      "role": "fast-path task classifier (imported by route_task)"
+    },
+    {
+      "path": "fleet/route_executor.py",
+      "role": "schema-driven chain resolution + receipt persistence (imported by route_task and gateway_call)"
+    },
+    {
+      "path": "fleet/gateway_call.py",
+      "role": "gateway caller with 403 fallback walking"
+    },
+    {
+      "path": "fleet/harness_eval.py",
+      "role": "11-task deterministic battery + runner + report"
+    },
+    {
+      "path": "fleet/run_opencode.py",
+      "role": "run the battery through the opencode rail (opencode run -> deterministic checkers -> record)"
+    },
+    {
+      "path": "fleet/cross_harness.py",
+      "role": "deterministic cross-rail comparison report (battery rows + plugin receipts, no model calls)"
+    },
+    {
+      "path": "fleet/report_dashboard.py",
+      "role": "render cross-harness report as self-contained styled HTML; --check self-grades"
+    },
+    {
+      "path": "fleet/gen_omo_config.py",
+      "role": "generate ~/.omo/omo.jsonc from the schema"
+    },
+    {
+      "path": "fleet/credit_watchdog.py",
+      "role": "Token Pass per-key spend watchdog"
+    },
+    {
+      "path": "fleet/night_cap_check.py",
+      "role": "unattended-run spend gate"
+    },
+    {
+      "path": "fleet/nightly_eval.py",
+      "role": "nightly battery orchestrator (gates, gateway rail, free opencode rail when RAM >= 4 GiB, report)"
+    },
+    {
+      "path": "fleet/weekly_routing_review.py",
+      "role": "receipts -> routing diff proposals (human approval)"
+    },
+    {
+      "path": "oms/opencode-plugin/index.ts",
+      "role": "receipt auto-capture from OpenCode agent-loop step events"
+    },
+    {
+      "path": "oms/verify.py",
+      "role": "package release gate (files, schema-battery parity, selftest, route smoke, config sync)"
+    },
+    {
+      "path": "fleet/ROUTING-BRAIN.md",
+      "role": "operating docs"
+    },
+    {
+      "path": "fleet/HARNESS-STACK.md",
+      "role": "architecture + naming contract + measured baseline"
+    },
+    {
+      "path": "fleet/omo_bridge.py",
+      "role": "OmO SUCCESS.md bar -> graded harness rows (owner != verifier enforced, check names must resolve to real battery checkers)"
+    }
+  ],
+  "entry_commands": [
+    "python fleet/route_task.py \"<task text>\" [--record success --used <model> --cost <usd> --latency <ms>]",
+    "python fleet/gateway_call.py <class> \"<task text>\"",
+    "python fleet/harness_eval.py run-gateway --model <vercel/model>",
+    "python fleet/run_opencode.py --model <opencode/model>",
+    "python fleet/harness_eval.py selftest",
+    "python fleet/harness_eval.py report",
+    "python fleet/cross_harness.py",
+    "python fleet/gen_omo_config.py",
+    "python fleet/credit_watchdog.py",
+    "python fleet/night_cap_check.py",
+    "python fleet/nightly_eval.py  # scheduled-task target after GATE approval",
+    "python fleet/weekly_routing_review.py",
+    "python oms/verify.py"
+  ],
+  "verify": {
+    "what": "oms/verify.py",
+    "checks": [
+      "manifest file list resolves on disk",
+      "schema parses and its battery task list matches harness_eval.TASKS",
+      "harness_eval selftest (all checkers against ground truth, no model calls)",
+      "route_task classifies a smoke prompt into a class the schema actually serves",
+      "gen_omo_config output on disk contains the schema's primary model (config is in sync)"
+    ],
+    "rule": "any check failing = package not releasable"
+  }
+}
