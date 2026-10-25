@@ -101,7 +101,7 @@ today. Leave the battery record as-is (two honest fails); this is precisely
 what the graded dataset is for — a weekly_routing_review/orchestrator
 proposal if it persists.
 
-**Battery v2.1 (12 tasks)**: `html-design` added — deterministic front-end
+**Battery v3-seed (13 tasks)**: `task-graph` added (multi-step dependency
 discipline probe (doctype, lang, viewport, alt, label-for, interactive
 element via `html.parser`; no LLM judging). Seed: DS-flash pass first run.
 Same day: `fleet/report_dashboard.py` renders the cross-harness report as a
