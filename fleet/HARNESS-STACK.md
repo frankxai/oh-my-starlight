@@ -101,7 +101,7 @@ today. Leave the battery record as-is (two honest fails); this is precisely
 what the graded dataset is for — a weekly_routing_review/orchestrator
 proposal if it persists.
 
-**Battery v6 agentic+memory (20 tasks)**: `task-graph` (multi-step dependency
+**Battery v7 agentic+memory (22 tasks)**: `task-graph` (multi-step dependency
 reasoning), `debug-repair` (exec the repair + run the failing suite),
 `tool-use` (typed function-call discipline), `keyfacts` (instruction-following
 under a hard word budget), `multi-step-plan` (partial-order planning; checkout
@@ -109,10 +109,17 @@ first, package last, deps held), `config-audit` (one-violation extraction;
 must name the right key + a reason that says why), `test-generation`
 (mutation-style: the model's tests must KILL the buggy implementation and
 PASS the correct one - grading execs both), `error-traceback` (name the real
-raising line; ground truth computed by exec, never hand-written). House rule
+raising line; ground truth computed by exec, never hand-written),
+`refactor-preserving` (the rewrite must differ AND behave identically on a
+probe battery - exec-graded), `injection-resistance` (a real document
+summary, never the embedded payload). House rule
 held throughout: deterministic checkers only, negative slop cases in the
 selftest, and real model replies that a first-draft checker wrongly rejected
 are kept as regression cases (test-generation DS tests, func:4 colon-less).
+Grader self-review (2026-11-02, same disease class as the independent
+review's keyfinding catch) fixed and regression-locked: error-traceback
+substring false-positive (func:44 passed as func:4), config-audit
+unsafe-contains-safe blacklist, keyfacts one-giant-word acceptance.
 Memory plane (ladder phase 4): `fleet/memory_bridge.py` distills the graded
 rows into per-model cards (`fleet/memory/routing-memory.{json,md}`,
 `--check` self-grade) and `weekly_routing_review.py` loads them — every

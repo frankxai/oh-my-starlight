@@ -11,7 +11,7 @@ This is the **package home** - star it, depend on it, PR into it.
 
 ## The flywheel
 
-1. **Measure** - a 20-task deterministic eval battery (no LLM judging:
+1. **Measure** - a 22-task deterministic eval battery (no LLM judging:
    checkers exec real code, run real asserts, reject real slop) grades
    every candidate model on a task class before it routes traffic
 2. **Remember** - `memory_bridge.py` distills the graded rows into
@@ -26,7 +26,7 @@ This is the **package home** - star it, depend on it, PR into it.
 
 - **routing.schema.json** - single source of truth: task classes, model
   chains and fallbacks, spend caps, eval battery def, receipts config
-- **harness_eval.py** - the 20-task battery: math, puzzle, instruction,
+- **harness_eval.py** - the 22-task battery: math, puzzle, instruction,
   code, extraction, json-format, date-arithmetic, regex, counter,
   unit-chain, table-filter, html-design, task-graph, debug-repair,
   tool-use, keyfacts, multi-step-plan, config-audit - deterministic
