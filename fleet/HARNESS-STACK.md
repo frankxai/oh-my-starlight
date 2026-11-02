@@ -101,9 +101,13 @@ today. Leave the battery record as-is (two honest fails); this is precisely
 what the graded dataset is for — a weekly_routing_review/orchestrator
 proposal if it persists.
 
-**Battery v3-seed (13 tasks)**: `task-graph` added (multi-step dependency
-discipline probe (doctype, lang, viewport, alt, label-for, interactive
-element via `html.parser`; no LLM judging). Seed: DS-flash pass first run.
+**Battery v3 agentic (16 tasks)**: `task-graph` (multi-step dependency
+reasoning), `debug-repair` (exec the repair + run the failing suite),
+`tool-use` (typed function-call discipline), `keyfacts` (instruction-following
+under a hard word budget). Agentic wave additions hold the house rule:
+deterministic checkers only, with negative slop cases in the selftest.
+Seed: DS-flash passes tool-use first run; keyfacts initially RED, then
+honest — the first adversarial-grader fix caught before any push.
 Same day: `fleet/report_dashboard.py` renders the cross-harness report as a
 self-contained tokened HTML dashboard and `--check` self-grades it
 (dogfoods the discipline the battery measures). The template ships
