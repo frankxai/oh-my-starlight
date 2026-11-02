@@ -13,3 +13,4 @@ changes are supersets via new numbered records.
 | 5 | [Export with sanitization](ADR-0005-export-with-sanitization.md) | accepted 2026-10-22 |
 | 6 | [maker ≠ verifier, human gates](ADR-0006-maker-not-verifier-human-gates.md) | accepted 2026-10-22 |
 | 7 | [No VM; park seats; hosted runners](ADR-0007-no-vm-capacity-strategy.md) | accepted 2026-10-22 |
+| 8 | [Starlight Cloudflare-first execution](ADR-0008-starlight-cloudflare-first.md) | proposed 2026-10-31 |
