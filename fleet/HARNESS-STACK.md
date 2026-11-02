@@ -101,6 +101,19 @@ today. Leave the battery record as-is (two honest fails); this is precisely
 what the graded dataset is for — a weekly_routing_review/orchestrator
 proposal if it persists.
 
+**Cron-layer hardening (2026-11-02, adversarial round 3 on the files the
+two PR reviews never saw)**: `night_cap_check.py` wore a hard-coded UTC+2
+local day (its own comment knew winter is CET +1) — wrong since the 2026-10-25
+DST switch, silent one-hour receipt misattribution, flips direction after
+March. Now computes the EU DST rule dep-free (`selftest`: 5 boundary cases).
+`weekly_routing_review.py` crashed on the first malformed ledger line (repro:
+one bad line = whole Monday 04:00 run dead) — now skips + counts malformed
+rows (`selftest`), ships `receipts_skipped_malformed` in the report. And the
+schtasks wire audit found the task running a pinned checkout stuck on a
+consumed branch: `nightly_eval.py` gains `prep` (step 0, fast-forward-only
+refresh; refuses to run stale, never touches foreign dirty state; already
+runs itself via `python fleet/nightly_eval.py prep`).
+
 **Battery v7 agentic+memory (22 tasks)**: `task-graph` (multi-step dependency
 reasoning), `debug-repair` (exec the repair + run the failing suite),
 `tool-use` (typed function-call discipline), `keyfacts` (instruction-following
