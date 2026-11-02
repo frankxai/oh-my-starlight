@@ -1,7 +1,7 @@
 # oh-my-starlight (OmS)
 
 The Starlight routing brain as a package: model routing schema (single
-source of truth), a 16-task deterministic eval battery, automatic receipts
+source of truth), an 18-task deterministic eval battery, automatic receipts
 of every agent-loop model call, spend caps + night gates, OmO bars
 (owner != verifier, machine-graded), and the architecture docs
 (HARNESS-STACK, ROUTING-BRAIN, ADRs).

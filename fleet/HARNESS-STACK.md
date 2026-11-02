@@ -101,13 +101,19 @@ today. Leave the battery record as-is (two honest fails); this is precisely
 what the graded dataset is for — a weekly_routing_review/orchestrator
 proposal if it persists.
 
-**Battery v3 agentic (16 tasks)**: `task-graph` (multi-step dependency
+**Battery v5 agentic+memory (18 tasks)**: `task-graph` (multi-step dependency
 reasoning), `debug-repair` (exec the repair + run the failing suite),
 `tool-use` (typed function-call discipline), `keyfacts` (instruction-following
-under a hard word budget). Agentic wave additions hold the house rule:
-deterministic checkers only, with negative slop cases in the selftest.
-Seed: DS-flash passes tool-use first run; keyfacts initially RED, then
-honest — the first adversarial-grader fix caught before any push.
+under a hard word budget), `multi-step-plan` (partial-order planning; checkout
+first, package last, deps held), `config-audit` (one-violation extraction;
+must name the right key + a reason that says why). House rule held throughout:
+deterministic checkers only, negative slop cases in the selftest.
+Memory plane (ladder phase 4): `fleet/memory_bridge.py` distills the graded
+rows into per-model cards (`fleet/memory/routing-memory.{json,md}`,
+`--check` self-grade) and `weekly_routing_review.py` loads them — every
+proposal now cites both evidence planes (receipts + battery memory), and
+review weeks with no receipts still carry the memory plane. Seed:
+DS-flash passes multi-step-plan (1.4s) and config-audit (2.0s) first run.
 Same day: `fleet/report_dashboard.py` renders the cross-harness report as a
 self-contained tokened HTML dashboard and `--check` self-grades it
 (dogfoods the discipline the battery measures). The template ships
