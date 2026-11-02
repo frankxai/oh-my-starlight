@@ -187,7 +187,9 @@ def _fmt_num(value, fmt: str = "{}") -> str:
 
 
 def build() -> str:
-    data = json.loads(REPORT_JSON.read_text(encoding="utf-8"))
+    # First adopter run: the report exists only after the first battery run.
+    data = (json.loads(REPORT_JSON.read_text(encoding="utf-8"))
+            if REPORT_JSON.exists() else {"battery": []})
 
     battery_rows = []
     total_passes = 0
@@ -229,7 +231,9 @@ def build() -> str:
         if item["harness"].startswith("opencode")
     )
 
-    gen = data["generated_at"][:19].replace("T", " ") + " UTC"
+    gen_at = data.get("generated_at")
+    gen = gen_at[:19].replace("T", " ") + " UTC" if gen_at \
+        else "generation time unknown"
 
     schema = json.loads(ROUTING_SCHEMA.read_text(encoding="utf-8"))
     tp = schema["token_pass"]
@@ -279,7 +283,7 @@ def build() -> str:
     primary_why = html.escape(schema["primary_why"])
 
     html_out = _DOC.format(
-        gen_attr=html.escape(data["generated_at"][:19]),
+        gen_attr=html.escape((data.get("generated_at") or "unknown")[:19]),
         gen=html.escape(gen),
         kpi_rows=total_passes,
         kpi_rails=len(data["battery"]),
@@ -327,6 +331,7 @@ def main() -> int:
                     help="self-grade the rendered surface; exit 1 on failure")
     args = ap.parse_args()
     out = build()
+    OUT_HTML.parent.mkdir(parents=True, exist_ok=True)
     OUT_HTML.write_text(out, encoding="utf-8", newline="\n")
     print(f"wrote {OUT_HTML} ({len(out)} bytes)")
     if args.check:
