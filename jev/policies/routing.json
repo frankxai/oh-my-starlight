@@ -1,0 +1,42 @@
+{
+  "id": "routing",
+  "description": "Pick the specialist lane for one work item. Replaces a prompt-and-parse classifier.",
+  "model": "typesafe/jev-1.13",
+  "notes": "Options are lanes that exist in the estate; keep them mutually exclusive. `other` is the escape hatch and must stay.",
+  "questions": {
+    "lane": {
+      "type": "choice",
+      "instructions": "Which lane owns `task`? Judge from the text of `task` only, not from who might prefer the work.",
+      "criteria": {
+        "code": "Writing or repairing code, tests, configuration or build scripts.",
+        "design": "Visual, interaction, layout, motion or brand-surface work.",
+        "research": "Finding, comparing or verifying information before any build.",
+        "ops": "Deployment, infrastructure, secrets, CI, monitoring or incidents.",
+        "docs": "Prose, documentation, changelogs or handovers with no behaviour change.",
+        "other": "Insufficient evidence, or the task spans lanes with no dominant one."
+      }
+    },
+    "blocked_by_ambiguity": {
+      "type": "noul",
+      "instructions": "Would a competent agent have to guess at least one material requirement to start `task`?",
+      "criteria": {
+        "true": "A required input, acceptance condition or target artifact is absent or contradictory.",
+        "false": "The task names what to change and how success is judged."
+      }
+    },
+    "risk": {
+      "type": "score",
+      "instructions": "How much damage follows if `task` is carried out wrongly and shipped without review?",
+      "criteria": [
+        "Reversible, local, no shared surface",
+        "Reversible with review, one shared surface",
+        "Hard to reverse, money, credentials or public surface"
+      ]
+    }
+  },
+  "policy": {
+    "lane": { "acceptWhen": ["code", "design", "research", "ops", "docs"], "reviewWhen": ["other"] },
+    "blocked_by_ambiguity": { "acceptAt": 0.25, "reviewAt": 0.55 },
+    "risk": { "acceptAt": 0.9, "reviewAt": 1.45 }
+  }
+}

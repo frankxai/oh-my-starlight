@@ -1,0 +1,17 @@
+{
+  "claim": "The Jev decision layer is wired end to end: core client, CLI, MCP server, policies and a skill.",
+  "evidence": [
+    "jev/src/client.mjs implements decide() with retry, timeout and receipt writing",
+    "jev/src/cli.mjs exposes decide, check and policies",
+    "jev/src/mcp.mjs exposes jev_decide, jev_check and jev_policies over stdio",
+    "jev/skills/jev-decisions/SKILL.md documents when to route a decision to Jev"
+  ],
+  "declared_scope": ["jev/**"],
+  "diff": [
+    { "path": "jev/src/client.mjs", "change": "added" },
+    { "path": "jev/src/cli.mjs", "change": "added" },
+    { "path": "jev/src/mcp.mjs", "change": "added" },
+    { "path": "jev/skills/jev-decisions/SKILL.md", "change": "added" },
+    { "path": "fleet/route_task.py", "change": "modified" }
+  ]
+}

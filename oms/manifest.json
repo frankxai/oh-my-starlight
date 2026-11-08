@@ -152,6 +152,74 @@
     {
       "path": "fleet/adapters/grok/README.md",
       "role": "adapter wiring doc (~/.grok hooks - GATE: human button)"
+    },
+    {
+      "path": "jev/CONTRACT.md",
+      "role": "jev: fixed interface contract (client, questions, verdict, CLI, MCP) that every lane implements"
+    },
+    {
+      "path": "jev/src/config.mjs",
+      "role": "jev: config + fail-closed key resolution (JEV_API_KEY / JEV_API_KEY_FILE / OPENROUTER_API_KEY), never logs the key"
+    },
+    {
+      "path": "jev/src/client.mjs",
+      "role": "jev: decide() over the Decisions API - validation, retry on 429/5xx, timeout, usage normalisation, metadata-only receipts"
+    },
+    {
+      "path": "jev/src/questions.mjs",
+      "role": "jev: noul/choice/score builders, noulTrue, verdict() ladder (reject > review > accept)"
+    },
+    {
+      "path": "jev/src/cli.mjs",
+      "role": "jev: CLI decide/check/policies, JSON stdout, exit 0 accept | 3 escalation | 2 config | 1 request"
+    },
+    {
+      "path": "jev/src/mcp.mjs",
+      "role": "jev: stdio MCP server exposing jev_decide, jev_check, jev_policies (readOnlyHint, object schemas)"
+    },
+    {
+      "path": "jev/policies/review-gate.json",
+      "role": "jev policy: gate a change or claim through evidence, scope and required review level"
+    },
+    {
+      "path": "jev/policies/routing.json",
+      "role": "jev policy: pick the owning lane for one work item"
+    },
+    {
+      "path": "jev/policies/triage.json",
+      "role": "jev policy: classify an inbound message by kind, blocking status and money request"
+    },
+    {
+      "path": "jev/skills/jev-decisions/SKILL.md",
+      "role": "jev skill: when to route a decision to Jev, question design, bands, escalation, operating rules"
+    },
+    {
+      "path": "jev/scripts/install-skill.mjs",
+      "role": "jev: project the skill into a harness skills root (dry-run, --force, destination check)"
+    },
+    {
+      "path": "jev/docs/INTEGRATION.md",
+      "role": "jev: per-harness MCP registration, AGENTS.md rule, loop/graph node, calibration and failure semantics"
+    },
+    {
+      "path": "jev/docs/TOOL-PLANE.md",
+      "role": "jev: shared tool-plane backend entry, where the policy is really edited, verification and rollback"
+    },
+    {
+      "path": "jev/tests/client.test.mjs",
+      "role": "jev: decide() unit tests with injected fetch (no network)"
+    },
+    {
+      "path": "jev/tests/questions.test.mjs",
+      "role": "jev: builder and verdict-ladder unit tests"
+    },
+    {
+      "path": "jev/tests/cli.test.mjs",
+      "role": "jev: CLI parsing, exit codes, stdin and policy unwrapping"
+    },
+    {
+      "path": "jev/tests/mcp.test.mjs",
+      "role": "jev: MCP tool definitions, keyless behaviour, missing-SDK path"
     }
   ],
   "entry_commands": [
@@ -168,7 +236,11 @@
     "python fleet/nightly_eval.py  # scheduled-task target after GATE approval",
     "python fleet/weekly_routing_review.py",
     "python fleet/memory_bridge.py [--check]",
-    "python oms/verify.py"
+    "python oms/verify.py",
+    "node jev/src/cli.mjs check",
+    "node jev/src/cli.mjs decide --state jev/examples/state.json --questions jev/examples/questions.json --policy review-gate",
+    "node jev/src/mcp.mjs",
+    "cd jev && npm test"
   ],
   "verify": {
     "what": "oms/verify.py",
