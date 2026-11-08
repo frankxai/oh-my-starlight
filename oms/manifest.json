@@ -90,6 +90,10 @@
       "role": "corps contract selftest: frontmatter/model/mode/permission validation + leak rule + negative fixtures"
     },
     {
+      "path": "fleet/registry_mcp.py",
+      "role": "MCP server (stdio JSON-RPC): the measured harness index as tools - registry_rows, matrix_report, cost_lookup, battery_selftest; read-only, stdlib"
+    },
+    {
       "path": "fleet/harness_matrix.py",
       "role": "same battery through every installed harness (claude/codex/grok/opencode): one eval row per harness+task, markdown matrix report, hermetic selftest"
     },

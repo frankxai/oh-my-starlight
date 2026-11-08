@@ -254,6 +254,20 @@ def main():
     proposals = propose(analysis, schema)
     memory = load_memory()
 
+    # starvation honesty: an empty report must say WHY it is empty (the
+    # 2026-11-08 runs reported 0/0/0 with no explanation - route_task
+    # simply is not being used, so routing receipts never accumulate)
+    notices = []
+    if not receipts:
+        notices.append(
+            "routing receipts: 0 rows in the 7-day window - route_task is "
+            "not in routine use, so no routing traffic exists to review. "
+            "Battery memory (" + f"{len(memory)} model cards" +
+            ") is available and will annotate any future proposal.")
+    if not bad and not receipts:
+        notices.append("no malformed lines either: the ledger is simply "
+                       "quiet, not corrupt.")
+
     # annotate each proposal with both models' battery memory, so the
     # human approval decision cites both evidence planes, not folklore
     for p in proposals:
@@ -264,6 +278,7 @@ def main():
         "window_days": 7,
         "receipt_count": len(receipts),
         "receipts_skipped_malformed": bad,
+        "notices": notices,
         "analysis": analysis,
         "proposals": proposals,
         "memory": memory,
@@ -274,6 +289,8 @@ def main():
     print(f"Wrote {out_path}")
     print(f"Receipts: {len(receipts)} (malformed skipped: {bad})  "
           f"Classes analyzed: {len(analysis)}  Proposals: {len(proposals)}")
+    for n in notices:
+        print(f"  NOTICE: {n}")
     if memory:
         cards = ", ".join(
             "{} {}".format(
