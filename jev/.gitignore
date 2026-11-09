@@ -1,0 +1,5 @@
+node_modules/
+receipts/
+*.jsonl
+.env
+.DS_Store

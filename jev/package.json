@@ -1,0 +1,38 @@
+{
+  "name": "@starlight/jev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed decision layer for agent workflows. TypeSafe Jev (System One) over the OpenRouter Decisions API, with a zero-dependency core, CLI, MCP server, policies and an agent skill.",
+  "keywords": [
+    "jev",
+    "typesafe",
+    "system-one",
+    "decision-model",
+    "mcp",
+    "opencode",
+    "agent-workflow"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "jev": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/client.mjs",
+    "./questions": "./src/questions.mjs",
+    "./config": "./src/config.mjs"
+  },
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\"",
+    "check": "node src/cli.mjs check",
+    "mcp": "node src/mcp.mjs",
+    "smoke": "node src/cli.mjs decide --state examples/state.json --questions examples/questions.json",
+    "install-skill": "node scripts/install-skill.mjs"
+  },
+  "optionalDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "license": "MIT"
+}

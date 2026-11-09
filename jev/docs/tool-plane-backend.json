@@ -1,0 +1,13 @@
+{
+  "id": "jev",
+  "kind": "stdio",
+  "singleton": true,
+  "command": "node",
+  "script": "C:\\Users\\frank\\starlight\\repos\\oh-my-starlight\\jev\\src\\mcp.mjs",
+  "args": [],
+  "namespace": "jev",
+  "policy": "read-only",
+  "toolTimeoutMs": 30000,
+  "allowTools": ["jev_decide", "jev_check", "jev_policies"],
+  "rationale": "Typed decisions for every harness from one pooled child. Read-only against a remote Decisions API; no local writes, no secrets in responses. Replaces per-harness prompt-and-parse classification with a calibrated number."
+}

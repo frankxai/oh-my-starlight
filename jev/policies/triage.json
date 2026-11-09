@@ -1,0 +1,39 @@
+{
+  "id": "triage",
+  "description": "Classify one inbound item for a queue: kind, urgency, and whether it asks for money.",
+  "model": "typesafe/jev-1.13",
+  "questions": {
+    "kind": {
+      "type": "choice",
+      "instructions": "What kind of item is `message`?",
+      "criteria": {
+        "bug": "Existing behaviour is described as wrong or broken.",
+        "feature": "Asks for behaviour that does not exist yet.",
+        "question": "Asks for information with no request to change anything.",
+        "billing": "A charge, invoice, refund or subscription.",
+        "other": "None of the above, or too little evidence to tell."
+      }
+    },
+    "blocks_work": {
+      "type": "noul",
+      "instructions": "Does `message` describe a workflow that is currently blocked, rather than an inconvenience or a preference?",
+      "criteria": {
+        "true": "The author states they cannot proceed without a fix.",
+        "false": "The author can continue with a workaround, or is asking for an improvement."
+      }
+    },
+    "money_requested": {
+      "type": "noul",
+      "instructions": "Does `message` ask for money back, a credit, or a change to what is charged?",
+      "criteria": {
+        "true": "It requests a refund, credit, discount or cancellation.",
+        "false": "It mentions money without asking for it to be returned or changed."
+      }
+    }
+  },
+  "policy": {
+    "kind": { "acceptWhen": ["bug", "feature", "question", "billing"], "reviewWhen": ["other"] },
+    "blocks_work": { "acceptAt": 0.85, "reviewAt": 0.5 },
+    "money_requested": { "acceptAt": 0.85, "reviewAt": 0.5 }
+  }
+}

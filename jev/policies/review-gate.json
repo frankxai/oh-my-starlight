@@ -1,0 +1,38 @@
+{
+  "id": "review-gate",
+  "description": "Gate a change, artifact or claim through named checks. Accept only when every answered check clears its band.",
+  "model": "typesafe/jev-1.13",
+  "notes": "Bands assume calibration on your own labelled cases. Start strict, loosen only with evidence.",
+  "questions": {
+    "evidence_supports_claim": {
+      "type": "noul",
+      "instructions": "Do the artifacts named in `evidence` actually support the claim in `claim`?",
+      "criteria": {
+        "true": "Every claim is traceable to a named artifact and the artifact says what the claim says.",
+        "false": "At least one claim is unsupported, contradicted by its artifact, or traceable only to a summary."
+      }
+    },
+    "scope_respected": {
+      "type": "noul",
+      "instructions": "Does `diff` stay inside the paths declared in `declared_scope`?",
+      "criteria": {
+        "true": "Every changed path is inside the declared scope, or is a generated file the scope explicitly allows.",
+        "false": "Any changed path falls outside the declared scope."
+      }
+    },
+    "requires_human": {
+      "type": "choice",
+      "instructions": "Which review level does `diff` require before merge?",
+      "criteria": {
+        "none": "Documentation, comments, or formatting only.",
+        "peer": "Behaviour change confined to one module with passing tests.",
+        "human": "Touches secrets, CI, deployment, permissions, migrations, or public API."
+      }
+    }
+  },
+  "policy": {
+    "evidence_supports_claim": { "acceptAt": 0.9, "reviewAt": 0.6 },
+    "scope_respected": { "acceptAt": 0.92, "reviewAt": 0.7 },
+    "requires_human": { "acceptWhen": ["none", "peer"], "reviewWhen": ["human"] }
+  }
+}
