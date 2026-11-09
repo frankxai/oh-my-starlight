@@ -227,7 +227,7 @@ export function policyThresholds(document) {
   return flat;
 }
 
-export async function loadPolicy(id, readFileImpl = (path) => readFile(path, "utf8")) {
+async function readPolicyDocument(id, readFileImpl) {
   const policyId = String(id ?? "").trim();
 
   if (policyId === "") throw new CliUsageError("--policy needs a policy id.");
@@ -261,12 +261,32 @@ export async function loadPolicy(id, readFileImpl = (path) => readFile(path, "ut
     throw new JevConfigError(`Policy "${policyId}" must be a JSON object of questionId -> thresholds.`);
   }
 
+  return { policyId, parsed };
+}
+
+export async function loadPolicy(id, readFileImpl = (path) => readFile(path, "utf8")) {
+  const { policyId, parsed } = await readPolicyDocument(id, readFileImpl);
+
   const thresholds = policyThresholds(parsed);
   if (Object.keys(thresholds).length === 0) {
     throw new JevConfigError(`Policy "${policyId}" declares no question thresholds.`);
   }
 
   return thresholds;
+}
+
+// A shipped policy carries both its questions and its bands. Until now only the bands were
+// reachable, so every policy listed by `jev policies` needed a hand-written questions file
+// before it could run. The questions block is the policy; let --policy stand alone.
+export async function loadPolicyQuestions(id, readFileImpl = (path) => readFile(path, "utf8")) {
+  const { policyId, parsed } = await readPolicyDocument(id, readFileImpl);
+
+  const questions = isPlainObject(parsed.questions) ? parsed.questions : null;
+  if (!questions || Object.keys(questions).length === 0) {
+    throw new JevConfigError(`Policy "${policyId}" declares no questions block. Pass --questions as well.`);
+  }
+
+  return questions;
 }
 
 export async function listPolicies(readFileImpl = (path) => readFile(path, "utf8")) {
@@ -360,8 +380,10 @@ async function runDecide(parsed, io, deps) {
   const stateSpec = flags["--state"];
   const questionsSpec = flags["--questions"];
 
-  if (!stateSpec || !questionsSpec) {
-    const message = "decide needs both --state and --questions (use - for stdin).";
+  if (!stateSpec || (!questionsSpec && flags["--policy"] === undefined)) {
+    const message = questionsSpec
+      ? "decide needs both --state and --questions (use - for stdin)."
+      : "decide needs both --state and --questions, or --state with --policy (use - for stdin).";
     diagnose(io.write, [message, USAGE]);
     emit(io.write, { ok: false, error: { code: "JEV_USAGE", message } });
     return 2;
@@ -393,7 +415,9 @@ async function runDecide(parsed, io, deps) {
   let questions;
   try {
     state = await readJsonInput(stateSpec, "--state", io);
-    questions = await readJsonInput(questionsSpec, "--questions", io);
+    questions = questionsSpec
+      ? await readJsonInput(questionsSpec, "--questions", io)
+      : await loadPolicyQuestions(flags["--policy"], io.readFile);
   } catch (error) {
     diagnose(io.write, error?.message ?? String(error));
     emit(io.write, errorPayload(error));

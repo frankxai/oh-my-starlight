@@ -223,6 +223,40 @@ test("decide calls decideImpl with resolved config defaults", async () => {
   assert.equal(result.json().answers.gate.noul, 0.97);
 });
 
+test("decide takes its questions from --policy when --questions is absent", async () => {
+  let captured = null;
+  const result = await run(["decide", "--state", "state.json", "--policy", "review-gate"], {
+    env: { JEV_API_KEY: "test-key" },
+    files: {
+      "state.json": JSON.stringify({ diff: "+ return 42;" }),
+      [resolve(POLICIES_DIR, "review-gate.json")]: JSON.stringify({
+        id: "review-gate",
+        questions: { gate: { type: "noul", instructions: "Is this safe to merge?" } },
+        policy: { gate: { acceptAt: 0.9, reviewAt: 0.6 } },
+      }),
+    },
+    deps: {
+      decideImpl: async (request) => {
+        captured = request;
+        return ACCEPT_RESULT;
+      },
+    },
+  });
+
+  assert.equal(result.code, 0);
+  assert.deepEqual(captured.questions, { gate: { type: "noul", instructions: "Is this safe to merge?" } });
+});
+
+test("decide refuses when neither --questions nor --policy supplies questions", async () => {
+  const result = await run(["decide", "--state", "state.json"], {
+    env: { JEV_API_KEY: "test-key" },
+    files: DECIDE_FILES,
+  });
+
+  assert.equal(result.code, 2);
+  assert.match(result.stderr, /--state with --policy/);
+});
+
 test("--model, --route, --receipts and --include-raw reach the request", async () => {
   let captured = null;
   await run(
