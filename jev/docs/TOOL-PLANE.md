@@ -55,15 +55,38 @@ C:\Users\frank\.starlight\tool-plane\releases\2.0.0-0b688c90b106
 ```
 
 That directory is a release artifact. `install-manifest.json` pins a sha256 per
-file, and the source of truth is:
+file, so hand-editing the release works immediately but breaks the manifest and
+is lost on the next release.
+
+The source of truth is the canonical repo:
 
 ```
-C:\Users\frank\starlight\worktrees\starlight-command-center-agent-ops-plane\apps\observatory
+C:\Users\frank\starlight\repos\starlight-command-center
+  apps\observatory\ops\shared-tool-plane.policy.json
 ```
 
-So the durable change is: edit the policy in that source worktree, rebuild the
-release, then activate it. Hand-editing the release file works immediately but
-breaks the manifest hash and is lost on the next release.
+The `source` path recorded in the old install manifest points at a worktree that
+no longer carries an `ops/` directory; treat it as stale and use the repo path
+above.
+
+Durable change, in order:
+
+1. Edit the policy on a branch of `starlight-command-center` (not in the shared
+   checkout if another harness holds it; use a worktree).
+2. Build and activate from that checkout:
+
+```powershell
+cd <starlight-command-center checkout>
+pwsh apps/observatory/scripts/Install-SharedToolPlane.ps1 -Mode Install -EnableAndStart
+```
+
+3. Verify with `apps/observatory/scripts/verify-shared-tool-plane.mjs`, which
+   reads the same policy and fails closed if a backend exposes a tool the policy
+   does not admit.
+
+Prepared and pushed, not activated: branch `agent/opencode/jev-tool-plane`
+(commit `efd1a1d`) adds this backend to the policy and passes the local policy
+checks. It needs a merge and an `Install` run to reach the running plane.
 
 `STARLIGHT_TOOL_PLANE_POLICY` overrides the policy path entirely, which is the
 safe way to trial a second policy file without touching the active release.
